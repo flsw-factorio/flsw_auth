@@ -137,7 +137,6 @@ function auth.interface.authenticate(player, password)
   local account = auth.get_account(player)
   local result = false
   if account then
-    auth.log(stringify(account))
     if not account.pass then
       result = "DEADBEEF"
     elseif account.pass == auth.gen_hash(account.name, password) then
