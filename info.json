@@ -1,10 +1,10 @@
 {
   "name": "flsw_auth",
   "version": "0.1.0",
-  "title": "Basic Authentication",
+  "title": "FLSW Auth",
   "author": "flsw-factorio",
   "contact": "",
   "homepage": "flsw.io",
-  "description": "A simple authentication mod brought to you by FLSW",
+  "description": "A simple authentication API with tokens",
   "dependencies": []
 }
