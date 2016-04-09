@@ -112,6 +112,15 @@ function auth.create_account(player, role)
   return account
 end
 
+function auth.is_admin(player)
+  if not player then return false end
+  local player = game.get_player(player)
+  if not player then return false end
+  local role = global.auth.accounts[player.name].role
+  auth.log("Auth admin check: " .. player.name .. " is " .. role)
+  return role == "admin"
+end
+
 --
 -- Public Interface
 --
@@ -156,16 +165,22 @@ end
 
 -- Set the role of an existing account (returns boolean)
 function auth.interface.set_role(token, player, role)
-  if not auth.validate(token) then
-    auth.log(string.format("Invalid token %s when setting role %s for %s",
-      stringify(token),
-      stringify(role),
-      stringify(player)
-    ))
+  local caller = false
+  if not token or not player then
+    error("Invalid parameters to set_role")
     return false
   end
-  caller = global.auth.tokens[token]
-  if caller and caller.role == "admin" then
+  if auth.validate(token) then
+    caller = global.auth.tokens[token]
+  else
+      auth.log(string.format("Invalid auth %s when setting role %s for %s",
+        stringify(token),
+        stringify(role),
+        stringify(player)
+      ))
+      return false
+  end
+  if caller and auth.is_admin(caller.name) then
     local account = auth.get_account(player)
     if not account then
       auth.log("Tried to set role on non-existent account: " .. stringify(name))
@@ -186,11 +201,11 @@ end
 
 -- Returns true if the given player has the admin role
 function auth.interface.is_admin(player)
-  local player = game.get_player(player)
-  if not player then return false end
-  local role = global.auth.accounts[player.name].role
-  auth.log("Auth admin check: " .. player.name .. " is " .. role)
-  return role == "admin"
+  if not player then
+    error("Invalid parameters to is_admin")
+    return false
+  end
+  return auth.is_admin(player)
 end
 
 -- Module test
@@ -217,6 +232,7 @@ end
 --
 function auth.init()
   global.auth = global.auth or { accounts = {}, tokens = {}, settings = {}}
+  global.auth.settings.verbose = 1
 end
 
 function auth.on_load()
