@@ -54,6 +54,7 @@ function auth.get_account(player)
 end
 
 function auth.invalidate_token(value)
+  if not value then return end
   local account = global.auth.tokens[value]
   if account then
     account.token = {}
